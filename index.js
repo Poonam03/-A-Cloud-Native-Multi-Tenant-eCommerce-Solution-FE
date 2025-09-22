@@ -7,6 +7,10 @@ app.use(express.static(path.join(__dirname, 'page')));
 
 const port = process.env.PORT || 3000;
 
-app.length(port, () => {
+app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+});
+
+app.get('*', function(req, res){
+  res.redirect('/app/site/404.html');
 });
