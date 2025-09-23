@@ -193,7 +193,7 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="page-header-left">
-                                <h3>Category
+                                <h3>Product
                                     <small>E-commerce Vendor Application</small>
                                 </h3>
                             </div>
@@ -205,7 +205,7 @@
                                         <i data-feather="home"></i>
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item active">Category</li>
+                                <li class="breadcrumb-item active">Product</li>
                             </ol>
                         </div>
                     </div>
@@ -224,7 +224,7 @@
                                 </form>
 
                                 <button type="button" id="addCategoryBtn" class="btn btn-primary add-row mt-md-0 mt-2">Add
-                                    Category
+                                    Product
                                 </button>
                             </div>
 
@@ -232,7 +232,7 @@
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel"> Category</h5>
+                                            <h5 class="modal-title" id="exampleModalLabel"> Product</h5>
                                         </div>
                                         <div class="modal-body">
                                             <form class="form-horizontal" id="addCategoryForm">
@@ -241,27 +241,46 @@
 
 
                                                     <input required="" name="name" type="text"
-                                                           class="form-control" placeholder="Category Name"
+                                                           class="form-control" placeholder="Product Name"
                                                            id="add-name">
                                                 </div>
                                                 <div class="form-group">
                                                     <input required="" name="description" type="textbox"
-                                                           class="form-control" placeholder="Category description"
+                                                           class="form-control" placeholder="Product description"
                                                            id="add-description">
                                                 </div>
 
                                                 <div class="form-group">
                                                     <input required="" name="slug" type="text"
-                                                           class="form-control" placeholder="Category slug"
-                                                           id="add-slug">
+                                                           class="form-control" placeholder="Product slug"
+                                                           id="add-slug"/>
                                                 </div>
+
+                                                <div class="form-group">
+                                                    <input required="" name="price" type="number"
+                                                           class="form-control" placeholder="Product Price"
+                                                           id="add-price"/>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <input required="" name="quantity" type="number"
+                                                           class="form-control" placeholder="Product quantity"
+                                                           id="add-quantity"/>
+                                                </div>
+
                                                 <div class="form-group">
                                                     <label>Image</label>
                                                    <select name="images" id="add-images">
                                                     </select>
                                                 </div>
+
+                                                <div class="form-group">
+                                                    <label>Category</label>
+                                                    <select name="categoryId" id="add-categoryId">
+                                                    </select>
+                                                </div>
                                                 <div class="form-button">
-                                                    <button class="btn btn-primary" type="submit" id = "add-btn">Add Category</button>
+                                                    <button class="btn btn-primary" type="submit" id = "add-btn">Add Product</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -281,6 +300,9 @@
                                             <th>Name</th>
                                             <th>Slug</th>
                                             <th>Description</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th>Category</th>
                                             <th>Option</th>
                                         </tr>
                                         </thead>
@@ -354,7 +376,7 @@
 
     addCategoryBtn.addEventListener('click', async (event) => {
         event.preventDefault();
-        document.getElementById('add-btn').innerText='Add Category';
+        document.getElementById('add-btn').innerText='Add Product';
         document.getElementById('add-btn').setAttribute('edit', 'false');
         categoryModal.classList.remove('d-none');
     });
@@ -401,7 +423,7 @@
 
     const storeJson = JSON.parse(window.localStorage.getItem('store'));
 
-    fetch(`http://localhost:8080/mt/v1/category/unsecured/all?vendorId=${window.localStorage.getItem('select-store')}&username=${storeJson['userInfo']['email']}`, requestOptions)
+    fetch(`http://localhost:8080/mt/v1/product/unsecured/all?vendorId=${window.localStorage.getItem('select-store')}&username=${storeJson['userInfo']['email']}`, requestOptions)
         .then((response) => {
             if (response.ok) {
                 response.json()
@@ -419,8 +441,14 @@
 
                                             <td data-field="name">${category.description}</td>
 
+                                            <td data-field="price">${category.price}</td>
+
+                                            <td data-field="quantity">${category.quantity}</td>
+
+                                            <td data-field="category">${category.categoryId}</td>
+
                                             <td>
-                                                <a href="javascript:editModal('${category.id}', '${category.name}' , '${category.slug}', '${category.description}')">
+                                                <a href="javascript:editModal('${category.id}', '${category.name}' , '${category.slug}', '${category.description}', ${category.price}, ${category.quantity} , '${category.categoryId}')">
                                                     <i class="fa fa-edit" title="Edit"></i>
                                                 </a>
 
@@ -473,6 +501,35 @@
         })
         .catch((error) => console.error(error));
 
+    const categoryDropdown = document.getElementById('add-categoryId');
+    categoryDropdown.innerHTML = '';
+
+    fetch(`http://localhost:8080/mt/v1/category/unsecured/all?vendorId=${window.localStorage.getItem('select-store')}&username=${storeJson['userInfo']['email']}`, requestOptions)
+        .then((response) => {
+            if(response.ok){
+                response.json()
+                    .then((categories) => {
+
+                        if(categories.length === 0){
+                            let option = document.createElement('option');
+                            option.value = '-1';
+                            option.textContent = 'No Categories to select';
+                            option.disabled = true;
+                            option.selected = false;
+                            categoryDropdown.appendChild(option);
+                        }
+                        categories.forEach((category) => {
+                            let option = document.createElement('option');
+                            option.value = category.id;
+                            option.textContent = category.name;
+                            categoryDropdown.appendChild(option);
+                        });
+                    });
+            }
+        })
+        .catch((error) => console.error(error));
+
+
     const addCategoryForm = document.getElementById('addCategoryForm');
     addCategoryForm.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -480,7 +537,10 @@
             'name': document.getElementById('add-name').value,
             'slug': document.getElementById('add-slug').value,
             'description': document.getElementById('add-description').value,
-            'vendorID': window.localStorage.getItem('select-store')
+            'vendorId': window.localStorage.getItem('select-store'),
+            'price': document.getElementById('add-price').value,
+            'quantity': document.getElementById('add-quantity').value,
+            'categoryId': document.getElementById('add-categoryId').value,
         };
         let edit = false;
         if(!(document.getElementById('add-id') === undefined || document.getElementById('add-id').value === '')){
@@ -507,7 +567,7 @@
                 body: JSON.stringify(data),
                 redirect: "follow"
             };
-            fetch("http://localhost:8080/mt/v1/category", editCategoryRequestOptions)
+            fetch("http://localhost:8080/mt/v1/product", editCategoryRequestOptions)
                 .then((response) => {
                     if(response.ok){
                         window.alert('Category updated Successfully');
@@ -529,13 +589,13 @@
                 redirect: "follow"
             };
 
-            fetch("http://localhost:8080/mt/v1/category", categoryRequestOptions)
+            fetch("http://localhost:8080/mt/v1/product", categoryRequestOptions)
                 .then((response) => {
                     if(response.ok){
-                        window.alert('Category saved');
+                        window.alert('Product saved');
                         window.location.reload();
                     } else {
-                        window.alert(`Error: Category not saved. Try again`);
+                        window.alert(`Error: Product not saved. Try again`);
                     }
                 })
                 .catch((error) => window.alert(error));
@@ -543,14 +603,17 @@
 
     });
 
-    function editModal(id, name,slug, description){
+    function editModal(id, name,slug, description, price, quantity, categoryID){
         categoryModal.classList.remove('d-none');
         document.getElementById('add-name').value = name;
         document.getElementById('add-slug').value = slug;
         document.getElementById('add-description').value = description;
         document.getElementById('add-id').value = id;
-        document.getElementById('add-btn').innerText = 'Edit category';
-        document.getElementById('add-btn').setAttribute('edit', 'true')
+        document.getElementById('add-btn').innerText = 'Edit Product';
+        document.getElementById('add-btn').setAttribute('edit', 'true');
+        document.getElementById('add-price').value = price;
+        document.getElementById('add-quantity').value = quantity;
+        document.getElementById('add-categoryId').value = categoryID;
     }
 
     function deleteCategory(id){
@@ -566,13 +629,13 @@
                 redirect: "follow"
             };
 
-            fetch(`http://localhost:8080/mt/v1/category?categoryId=${id}&vendorId=${window.localStorage.getItem('select-store')}`, categoryRequestOptions)
+            fetch(`http://localhost:8080/mt/v1/product?id=${id}&vendorId=${window.localStorage.getItem('select-store')}`, categoryRequestOptions)
                 .then((response) => {
                     if(response.ok){
-                        window.alert('Category deleted successfully');
+                        window.alert('Product deleted successfully');
                         window.location.reload();
                     } else {
-                        window.alert(`Error: failed to delete category`);
+                        window.alert(`Error: failed to delete Product`);
                     }
                 })
                 .catch((error) => window.alert(error));

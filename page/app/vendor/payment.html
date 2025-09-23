@@ -193,7 +193,7 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="page-header-left">
-                                <h3>Media
+                                <h3>Payments
                                     <small>E-commerce Vendor Application</small>
                                 </h3>
                             </div>
@@ -205,7 +205,7 @@
                                         <i data-feather="home"></i>
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item active">Media</li>
+                                <li class="breadcrumb-item active">Payment</li>
                             </ol>
                         </div>
                     </div>
@@ -214,69 +214,32 @@
             <!-- Container-fluid Ends-->
 
             <!-- Container-fluid starts-->
-            <div class="container-fluid bulk-cate">
-                <div class="card ">
-                    <div class="card-body">
-                        <form class="form-horizontal" id="mediaUpload">
-                            <div class="form-group">
-                                <input type="file" class="custom-file-input" id="customFile" name="filename">
-                                <label class="custom-file-label" for="customFile">Choose file</label>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive table-desi">
+                                    <table class="table all-package table-category " >
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Order ID</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                        </thead>
+
+                                        <tbody id="category-list">
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <input required="" name="alt" type="text"
-                                       class="form-control" placeholder="Alt Name">
-                            </div>
-                            <div class="form-button">
-                                <button class="btn btn-primary" type="submit">Upload Media</button>
-                            </div>
-
-                        </form>
-                    </div>
-                </div>
-
-                <div class="card">
-
-
-                    <div class="card-body">
-                        <div class="table-responsive table-desi">
-                            <table class="all-package coupon-table table table-striped">
-                                <thead>
-                                <tr>
-                                    <th>
-                                        <button type="button"
-                                                class="btn btn-primary add-row delete_all">Delete</button>
-                                    </th>
-                                    <th>Image</th>
-                                    <th>File Name</th>
-                                    <th>URL</th>
-                                </tr>
-                                </thead>
-
-                                <tbody id="image-list">
-
-
-                                <!--                                        <tr data-row-id="20">-->
-                                <!--                                            <td>-->
-                                <!--                                                <input class="checkbox_animated check-it" type="checkbox" value=""-->
-                                <!--                                                    id="flexCheckDefault19" data-id="20">-->
-                                <!--                                            </td>-->
-
-                                <!--                                            <td>-->
-                                <!--                                                <img src="assets/images/dashboard/product/20.jpg" alt="user">-->
-                                <!--                                            </td>-->
-
-                                <!--                                            <td>Motorola_Bluetooth.jpg</td>-->
-
-                                <!--                                            <td>http://www.assets/images/dashboard/product/20.jpg</td>-->
-                                <!--                                        </tr>-->
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Container-fluid Ends-->
-        </div>
             <!-- Container-fluid Ends-->
         </div>
 
@@ -358,6 +321,7 @@
     });
 
     const storeJson = JSON.parse(window.localStorage.getItem('store'));
+
     fetch(`http://localhost:8080/mt/v1/order/vendor?vendorId=${window.localStorage.getItem('select-store')}`, requestOptions)
         .then((response) => {
             if (response.ok) {
