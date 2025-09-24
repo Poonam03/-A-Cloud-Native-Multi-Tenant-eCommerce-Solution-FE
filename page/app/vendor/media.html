@@ -242,33 +242,14 @@
                             <table class="all-package coupon-table table table-striped">
                                 <thead>
                                 <tr>
-                                    <th>
-                                        <button type="button"
-                                                class="btn btn-primary add-row delete_all">Delete</button>
-                                    </th>
                                     <th>Image</th>
                                     <th>File Name</th>
                                     <th>URL</th>
                                 </tr>
                                 </thead>
 
-                                <tbody id="image-list">
+                                <tbody id="category-list">
 
-
-                                <!--                                        <tr data-row-id="20">-->
-                                <!--                                            <td>-->
-                                <!--                                                <input class="checkbox_animated check-it" type="checkbox" value=""-->
-                                <!--                                                    id="flexCheckDefault19" data-id="20">-->
-                                <!--                                            </td>-->
-
-                                <!--                                            <td>-->
-                                <!--                                                <img src="assets/images/dashboard/product/20.jpg" alt="user">-->
-                                <!--                                            </td>-->
-
-                                <!--                                            <td>Motorola_Bluetooth.jpg</td>-->
-
-                                <!--                                            <td>http://www.assets/images/dashboard/product/20.jpg</td>-->
-                                <!--                                        </tr>-->
                                 </tbody>
                             </table>
                         </div>
@@ -358,20 +339,38 @@
     });
 
     const storeJson = JSON.parse(window.localStorage.getItem('store'));
-    fetch(`http://localhost:8080/mt/v1/order/vendor?vendorId=${window.localStorage.getItem('select-store')}`, requestOptions)
-        .then((response) => {
-            if (response.ok) {
-                response.json()
-                    .then((orders) => {
-                        let innerHtml = ``;
 
+    const imageHeader = new Headers();
+    imageHeader.append("Authorization", window.localStorage.getItem('token'));
+
+    const imageRequestOptions = {
+        method: "GET",
+        headers: imageHeader,
+        redirect: "follow"
+    };
+
+
+    fetch("http://localhost:8080/mt/v1/image", imageRequestOptions)
+        .then((response) => {
+            if(response.ok){
+                response.json()
+                    .then((images) => {
+                        let innerHtml = ``;
+                        images.forEach((image) => {
+                            innerHtml = `${innerHtml}
+                                <tr>
+                                    <td><img src="http://localhost:8080/mt/v1/image/unsecured/display/${image.imageUrl}" alt="${image.altText}"></td>
+                                    <td>${image.imageUrl}</td>
+                                    <td><a href="http://localhost:8080/mt/v1/image/unsecured/display/${image.imageUrl}">http://localhost:8080/mt/v1/image/unsecured/display/${image.imageUrl}</a></td>
+                                </tr>
+
+                            `;
+                        });
                         categoryList.innerHTML = innerHtml;
                     });
-            } else {
-                throw new Error(response.text());
             }
         })
-        .catch((error) => window.alert(`Error: ${error}`));
+        .catch((error) => console.error(error));
 
     function logout(){
         window.localStorage.clear();

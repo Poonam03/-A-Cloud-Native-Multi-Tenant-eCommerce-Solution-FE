@@ -223,9 +223,10 @@
                                     <table class="table all-package table-category " >
                                         <thead>
                                         <tr>
-                                            <th>ID</th>
+                                            <th>Payment ID</th>
                                             <th>Order ID</th>
                                             <th>Amount</th>
+                                            <th>User</th>
                                         </tr>
                                         </thead>
 
@@ -322,14 +323,38 @@
 
     const storeJson = JSON.parse(window.localStorage.getItem('store'));
 
-    fetch(`http://localhost:8080/mt/v1/order/vendor?vendorId=${window.localStorage.getItem('select-store')}`, requestOptions)
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", window.localStorage.getItem('token'));
+
+    const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+    };
+
+    fetch(`http://localhost:8080/mt/v1/payment?vendorId=${window.localStorage.getItem('select-store')}`, requestOptions)
         .then((response) => {
             if (response.ok) {
                 response.json()
-                    .then((orders) => {
+                    .then((payments) => {
                         let innerHtml = ``;
-
-                        categoryList.innerHTML = innerHtml;
+                        payments.forEach((payment) => {
+                            innerHtml = `${innerHtml}<tr>
+                                            <td>
+                                                ${payment.id}
+                                            </td>
+                                            <td>
+                                                ${payment.orderId}
+                                            </td>
+                                            <td>
+                                                ${payment.amount} <i class="fa fa-inr" ></i>
+                                            </td>
+                                            <td>
+                                                ${payment.userName}
+                                            </td>
+                                            `;
+                            categoryList.innerHTML = innerHtml;
+                        });
                     });
             } else {
                 throw new Error(response.text());
