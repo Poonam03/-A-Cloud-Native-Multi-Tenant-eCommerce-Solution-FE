@@ -227,6 +227,7 @@
                                             <th>Product</th>
                                             <th>Status</th>
                                             <th>Price</th>
+                                            <th>Customer Address</th>
                                         </tr>
                                         </thead>
 
@@ -383,6 +384,8 @@
                                             <td data-field="Status">${order.orderStatus} ${btnHtml}</td>
 
                                             <td data-field="price">${order.price} <i class="fa fa-inr" ></i></td>
+
+                                            <td>${order.addressLine1}<br>${order.addressLine2}<br/>${order.city} ${order.state} ${order.country} <br/>${order.phone}</td>
 
 
                                         </tr>`;
