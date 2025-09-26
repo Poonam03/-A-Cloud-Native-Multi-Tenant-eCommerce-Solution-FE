@@ -63,9 +63,9 @@
                                             <div class="mobile-back text-end">Back<i class="fa fa-angle-right ps-2"
                                                                                      aria-hidden="true"></i></div>
                                         </li>
-                                        <li><a href="store.html">Home</a></li>
+                                        <li><a href="index.html">Home</a></li>
                                         <li><a href="cehckout.html">Checkout</a></li>
-                                        <li><a href="index.html">Store</a></li>
+                                        <li id="user"></li>
                                     </ul>
                                 </nav>
                             </div>
@@ -73,9 +73,7 @@
                                 <ul class="header-dropdown">
                                     <li class="onhover-dropdown mobile-account">
                                         <img src="../assets/images/icon/user-1.png" alt="">
-                                        <a href="#" data-lng="en">
-                                            Login
-                                        </a>
+                                        <span id = "login" style="color:black"></span>
                                     </li>
                                 </ul>
                             </div>
@@ -276,8 +274,12 @@
 
     dropdown.addEventListener('change', function (event) {
         const selectedValue = event.target.value;
+        window.localStorage.removeItem('cart');
         window.location.href = `store.html#${dropdown.options[dropdown.selectedIndex].text}`;
     });
+
+    const user = document.getElementById('user');
+    user.innerHTML = `${window.localStorage.getItem('userName') ? `<span>${window.localStorage.getItem('userName')}</span> <a href="">Logout</a>`: `Guest <a href="login.html">Login</a>`}`;
 
     fetch("http://localhost:8080/mt/v1/vendor/unsecured/all", requestOptions)
         .then(response => {
@@ -302,6 +304,16 @@
             window.location.href='soon.html';
         });
 
+    const user1 = document.getElementById('user');
+    user1.innerHTML = `${window.localStorage.getItem('userName') ? ` <a href="javascript:logout()">Logout</a>`: `<a href="login.html">Login</a>`}`;
+
+    const username = document.getElementById('login');
+    username.innerText = `${window.localStorage.getItem('userName') ? `${window.localStorage.getItem('userName')}`: 'Guest'}`;
+
+    function logout() {
+        window.localStorage.removeItem('userName');
+        window.location.href = 'login.html';
+    }
 
 </script>
 </body>

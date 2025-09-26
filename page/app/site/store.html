@@ -63,9 +63,9 @@
                                                 <div class="mobile-back text-end">Back<i class="fa fa-angle-right ps-2"
                                                         aria-hidden="true"></i></div>
                                             </li>
-                                            <li><a href="store.html">Home</a></li>
+                                            <li><a href="index.html">Home</a></li>
                                             <li><a href="cehckout.html">Checkout</a></li>
-                                            <li><a href="index.html">Store</a></li>
+                                            <li id="user"></li>
                                         </ul>
                                     </nav>
                                 </div>
@@ -73,9 +73,7 @@
                                     <ul class="header-dropdown">
                                         <li class="onhover-dropdown mobile-account">
                                             <img src="../assets/images/icon/user-1.png" alt="">
-                                            <a href="#" data-lng="en">
-                                                Login
-                                            </a>
+                                            <span id = "login" style="color:black"></span>
                                         </li>
                                     </ul>
                                 </div>
@@ -373,13 +371,13 @@
                                 innerHtml = `<h2 style="text-align: center">No Product Added by vendor.</h2>`;
                             }
                             products.forEach((product) => {
-                                innerHtml += `<div class="product-box">
+                                innerHtml += `<div class="product-box" style="width: 280px">
                             <div class="img-wrapper">
-                                <a href="javascript:void()"><img
+                                <img
                                         src="${product.imageBOS[0] === undefined ? `../assets/images/gradient/product/4.jpg`:`http://localhost:8080/mt/v1/image/unsecured/display/${product.imageBOS[0].imageUrl}`}"
-                                        class="img-fluid blur-up lazyload bg-img" alt=""></a>
+                                        class="img-fluid blur-up lazyload bg-img" alt="">
                                 <div class="cart-box cart-box-bottom">
-                                    <button data-bs-toggle="modal" data-bs-target="#addtocart" title="Add to cart"><i
+                                    <button onclick="cartAdd('${product.id}', 'http://localhost:8080/mt/v1/image/unsecured/display/${product.imageBOS[0].imageUrl}' , '${product.name}', '${product.price}' )" title="Add to cart"><i
                                             class="ti-shopping-cart"></i></button>
                                 </div>
                             </div>
@@ -400,6 +398,33 @@
         }
 
 
+        const user = document.getElementById('user');
+        user.innerHTML = `${window.localStorage.getItem('userName') ? ` <a href="javascript:logout()">Logout</a>`: `<a href="login.html">Login</a>`}`;
+
+        const username = document.getElementById('login');
+        username.innerText = `${window.localStorage.getItem('userName') ? `${window.localStorage.getItem('userName')}`: 'Guest'}`;
+
+        function logout() {
+            window.localStorage.removeItem('userName');
+            window.location.href = 'login.html';
+        }
+
+        function cartAdd(productId , image, name, price) {
+            let cart = window.localStorage.getItem('cart');
+            if(cart === undefined || cart === null){
+                cart = {};
+            } else{
+                cart = JSON.parse(cart);
+            }
+            if(cart[productId] === undefined){
+                cart[productId] = {quantity: 1, image: image, name: name, price: price};
+            } else{
+                let val = cart[productId]['quantity']+1;
+                cart[productId] = {quantity: val, image: image, name: name, price: price};
+            }
+            window.localStorage.setItem('cart', JSON.stringify(cart));
+            window.alert('Product added to cart')
+        }
     </script>
 </body>
 

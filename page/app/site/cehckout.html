@@ -2,6 +2,34 @@
 <html lang="en">
 
 <head>
+    <script>
+        if (window.localStorage.getItem('token') === undefined) {
+            window.localStorage.clear();
+            window.location.href = '/app/site/login.html'
+        } else {
+            const myHeaders = new Headers();
+            myHeaders.append("Authorization", window.localStorage.getItem('token'));
+
+            const requestOptions = {
+                method: "GET",
+                headers: myHeaders,
+                redirect: "follow"
+            };
+
+            fetch("http://localhost:8080/mt/v1/user", requestOptions)
+                .then((response) => {
+                    if (!response.ok) {
+                        window.localStorage.clear();
+                        window.location.href = '/app/site/login.html'
+                    }
+                })
+                .catch((error) => {
+                    window.localStorage.clear();
+                    window.location.href = '/app/site/login.html'
+                });
+        }
+
+    </script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -73,9 +101,7 @@
                                 <ul class="header-dropdown">
                                     <li class="onhover-dropdown mobile-account">
                                         <img src="../assets/images/icon/user-1.png" alt="">
-                                        <a href="#" data-lng="en">
-                                            <span id = "login" style="color:black"></span>
-                                        </a>
+                                        <span id = "login" style="color:black"></span>
                                     </li>
                                 </ul>
                             </div>
@@ -117,19 +143,50 @@
 <!-- header end -->
 
 
-<section class="p-0">
+<!-- category section start -->
+<!--section start-->
+<section class="cart-section section-b-space">
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <div class="error-section">
-                    <h1>404</h1>
-                    <h2>page not found</h2>
-                    <a href="index.html" class="btn btn-solid">back to home</a>
+                <div class="cart_counter">
+                    <h4>Cart</h4>
+                </div>
+            </div>
+            <div class="col-sm-12 table-responsive-xs">
+                <table class="table cart-table">
+                    <thead>
+                    <tr class="table-head">
+                        <th scope="col">image</th>
+                        <th scope="col">product name</th>
+                        <th scope="col">price</th>
+                        <th scope="col">quantity</th>
+                        <th scope="col">action</th>
+                        <th scope="col">total</th>
+                    </tr>
+                    </thead>
+                    <tbody id ='category'></tbody>
+                </table>
+                <div class="table-responsive-md">
+                    <table class="table cart-table ">
+                        <tfoot>
+                        <tr>
+                            <td>total price :</td>
+                            <td>
+                                <h2 id="total-price"> 0 <i class="fa fa-inr" ></i></h2>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
+        <div class="row cart-buttons">
+            <div class="col-6"><a href="javascript:checkout()" class="btn btn-solid">check out</a></div>
+        </div>
     </div>
 </section>
+<!--section end-->
 
 
 <!-- footer -->
@@ -252,23 +309,134 @@
 <script>
     new WOW().init();
 
-    function openSearch() {
-        document.getElementById("search-overlay").style.display = "block";
-    }
-
-    function closeSearch() {
-        document.getElementById("search-overlay").style.display = "none";
-    }
 
     const user = document.getElementById('user');
     user.innerHTML = `${window.localStorage.getItem('userName') ? ` <a href="javascript:logout()">Logout</a>`: `<a href="login.html">Login</a>`}`;
 
     const username = document.getElementById('login');
     username.innerText = `${window.localStorage.getItem('userName') ? `${window.localStorage.getItem('userName')}`: 'Guest'}`;
-
     function logout() {
         window.localStorage.removeItem('userName');
         window.location.href = 'login.html';
+    }
+
+
+    const category = document.getElementById('category');
+
+    let innerHtml = ``;
+    let cart = window.localStorage.getItem('cart') !== undefined ? JSON.parse(window.localStorage.getItem('cart')) : {};
+    let price = 0;
+    for(var key in  cart){
+        innerHtml += `
+                    <tr>
+                        <td>
+                            <a href="#"><img src="${cart[key]['image']}" alt=""></a>
+                        </td>
+                        <td><a href="#">${cart[key]['name']}</a>
+                            <div class="mobile-cart-content row">
+                                <div class="col">
+                                    <div class="qty-box">
+                                        <div class="input-group">
+                                            <input type="text" disabled="true" readonly name="quantity" class="form-control input-number"
+                                                   value="1">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <h2 class="td-color">${cart[key]['price']} <i class="fa fa-inr" ></i></h2>
+                                </div>
+                                <div class="col">
+                                    <h2 class="td-color"><a  class="icon"><i class="ti-close"></i></a>
+                                    </h2>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <h2>${cart[key]['price']} <i class="fa fa-inr" ></i></h2>
+                        </td>
+                        <td>
+                            <div class="qty-box">
+                                <div class="input-group">
+                                    <input type="number" name="quantity" class="form-control input-number"
+                                           value="${cart[key]['quantity']}">
+                                </div>
+                            </div>
+                        </td>
+                        <td><a href="javascript:remove('${key}')" class="icon"><i class="ti-close"></i></a></td>
+                        <td>
+                            <h2 class="td-color">${cart[key]['price'] * cart[key]['quantity']} <i class="fa fa-inr" ></i></h2>
+                        </td>
+                    </tr>
+                    `;
+        price += cart[key]['price'] * cart[key]['quantity'];
+    }
+
+
+
+    document.getElementById('total-price').innerHTML = price + '<i class="fa fa-inr" ></i>';
+
+    category.innerHTML = innerHtml;
+
+
+    function remove(key){
+        let cart = window.localStorage.getItem('cart');
+        if(cart !== undefined){
+            cart = JSON.parse(cart);
+            delete cart[key];
+            window.localStorage.setItem('cart', JSON.stringify(cart));
+        }
+        window.location.reload();
+    }
+
+    function checkout(){
+        let cart = JSON.parse(window.localStorage.getItem('cart'));
+
+        if(cart === undefined || cart === null || cart.length === 0 || Object.keys(cart).length === 0){
+            window.alert('Add Product in cart')
+        } else{
+            let data = {
+                "userInfoBO": JSON.parse(window.localStorage.getItem('user')),
+                "vendorId": window.localStorage.getItem('store'),
+                "orderStatus": "CREATE",
+                "phone": JSON.parse(window.localStorage.getItem('user'))['phone'],
+                "addressLine1": JSON.parse(window.localStorage.getItem('user'))['addressLine1'],
+                "addressLine2": JSON.parse(window.localStorage.getItem('user'))['addressLine2'],
+                "city": JSON.parse(window.localStorage.getItem('user'))['city'],
+                "state": JSON.parse(window.localStorage.getItem('user'))['state'],
+                "country": JSON.parse(window.localStorage.getItem('user'))['country'],
+                "zipCode": JSON.parse(window.localStorage.getItem('user'))['zipCode'],
+                productBO: []
+            }
+            for(let key in cart){
+                data.productBO.push({
+                    "id": key,
+                    "quantity": cart[key]['quantity'],
+                })
+            }
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("Authorization", window.localStorage.getItem('token'));
+
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: "follow"
+            };
+
+            fetch("http://localhost:8080/mt/v1/order?vendor="+window.localStorage.getItem('store'), requestOptions)
+                .then((response) => {
+                    if(response.ok){
+                        alert('Order has been placed')
+                        window.localStorage.removeItem('cart');
+                    } else {
+                        response.json().then((data) => {alert(data.message)});
+                    }
+                })
+                .catch((error) => alert(error));
+
+        }
+
     }
 
 </script>
