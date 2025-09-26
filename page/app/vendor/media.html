@@ -219,11 +219,11 @@
                     <div class="card-body">
                         <form class="form-horizontal" id="mediaUpload">
                             <div class="form-group">
-                                <input type="file" class="custom-file-input" id="customFile" name="filename">
+                                <input id="fileInput" type="file" class="custom-file-input" id="customFile" name="filename" required>
                                 <label class="custom-file-label" for="customFile">Choose file</label>
                             </div>
                             <div class="form-group">
-                                <input required="" name="alt" type="text"
+                                <input id="altInput" required="" name="alt" type="text"
                                        class="form-control" placeholder="Alt Name">
                             </div>
                             <div class="form-button">
@@ -348,6 +348,34 @@
         headers: imageHeader,
         redirect: "follow"
     };
+
+    const form = document.getElementById('mediaUpload');
+
+    form.addEventListener('submit', (event) =>{
+        event.preventDefault();
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", window.localStorage.getItem('token'));
+        const formdata = new FormData();
+        const file = document.getElementById('fileInput');
+        formdata.append('file', file.files[0]);
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: formdata,
+            redirect: "follow"
+        };
+
+        fetch(`http://localhost:8080/mt/v1/image?altText=${document.getElementById('altInput').value}`, requestOptions)
+            .then((response) => {
+                if(response.ok){
+                    window.alert('File Uploaded successfully.')
+                    window.location.reload();
+                } else {
+                    window.alert('Failed to upload file')
+                }
+            })
+            .catch((error) =>  window.alert('Failed to upload file'));
+    })
 
 
     fetch("http://localhost:8080/mt/v1/image", imageRequestOptions)
